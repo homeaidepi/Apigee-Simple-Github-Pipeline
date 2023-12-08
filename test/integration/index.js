@@ -1,6 +1,6 @@
-var reporter = require('cucumber-html-reporter');
+const reporter = require('cucumber-html-reporter');
  
-var options = {
+const options = {
         theme: 'bootstrap',
         jsonFile: './report.json',
         output: './cucumber_report.html',
