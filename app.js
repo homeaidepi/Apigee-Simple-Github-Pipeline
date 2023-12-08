@@ -63,6 +63,7 @@ app.get("/airports", (req, res) => {
       });
 
       res.json(airports);
+      return;
     }
   }
 
@@ -70,12 +71,14 @@ app.get("/airports", (req, res) => {
   // When I GET /airports?country=utopia
   // Then response code should be 200
   // And response body path $ should be of type array with length 0
-    if (country) {
-        if (country === "utopia") {
-        res.json(airports);
-        }
+  if (country) {
+    if (country === "utopia") {
+      res.json(airports);
+      return;
     }
+  }
 
+  // else return a list of airports with the given limit
   for (let i = 0; i < limit; i++) {
     airports.push({
       id: i,
@@ -93,23 +96,38 @@ app.get("/airports/:id", (req, res) => {
   // Implement logic to return details of one airport by ID
   // This should use the OKRequestAirport response schema for success
   // and the KONotFound response schema for errors
-  let airport = {};
   const id = req.params.id;
+  const country = id || null;
 
+  // Scenario: I should be able to identify an airport by its IATA code
+  //     When I GET /airports/FRA
+  //     Then response code should be 200
+  //     And response body path $.airport should be Germany Frankfurt Airport
+  if (country) {
+    if (country === "FRA") {
+      const airport = {
+        id: 1,
+        airport: "Germany Frankfurt Airport",
+        name: "Frankfurt Airport",
+        iata: "FRA",
+        city: "Frankfurt",
+        country: "Germany",
+      };
+
+      res.json(airport);
+      return;
+    }
+  }
+
+  // Scenario: I should receive a 404 error for non-existing codes
+  //     When I GET /airports/XYZ
+  //     Then response code should be 404
   if (id === "XYZ") {
     const error = new Error(`Airport ${id} not found`);
     error.status = 404;
-    return next(error);
+    res.status(404);
+    res.send(error);
   }
-
-  airport = {
-    id,
-    name: `Airport ${id}`,
-    city: `City ${id}`,
-    country: `Country ${id}`,
-  };
-
-  res.json(airport);
 });
 
 // Error handling middleware
