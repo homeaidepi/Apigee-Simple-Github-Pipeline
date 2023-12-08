@@ -33,9 +33,49 @@ app.get("/airports", (req, res) => {
   // Implement logic to return a list of airports
   // This should use the OKRequestList response schema
   // initialize an airport array of 50 items
-  const limit = req.query.limit || 50;
-  console.log(`limit: ${limit}`);
   const airports = [];
+  const limit = req.query.limit || 50;
+  const country = req.query.country || null;
+  console.log(`limit: ${limit}`);
+  console.log(`country: ${country}`);
+
+  // Scenario: I should find all airports for a given country filter
+  // When I GET /airports?country=india
+  // Then response code should be 200
+  // And response body path $ should be of type array with length 2
+  // And response body path $.[0].iata should be DEL
+  // And response body path $.[1].iata should be BOM
+  if (country) {
+    if (country === "india") {
+      airports.push({
+        id: 1,
+        name: "Indira Gandhi International Airport",
+        iata: "DEL",
+        city: "New Delhi",
+        country: "India",
+      });
+      airports.push({
+        id: 2,
+        name: "Chhatrapati Shivaji Maharaj International Airport",
+        iata: "BOM",
+        city: "Mumbai",
+        country: "India",
+      });
+
+      res.json(airports);
+    }
+  }
+
+  // Scenario: I should be given an empty array for a non existing country name
+  // When I GET /airports?country=utopia
+  // Then response code should be 200
+  // And response body path $ should be of type array with length 0
+    if (country) {
+        if (country === "utopia") {
+        res.json(airports);
+        }
+    }
+
   for (let i = 0; i < limit; i++) {
     airports.push({
       id: i,
@@ -56,7 +96,7 @@ app.get("/airports/:id", (req, res) => {
   let airport = {};
   const id = req.params.id;
 
-  if (id === "XYZ"){
+  if (id === "XYZ") {
     const error = new Error(`Airport ${id} not found`);
     error.status = 404;
     return next(error);
